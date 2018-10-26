@@ -104,13 +104,10 @@ objects:
       workspace-storage-create-folders: "false"
       local-conf-dir: /etc/conf
       openshift-serviceaccountname: che
-      che-server-evaluation-strategy: docker-local-custom
       che.logs.dir: /data/logs
-      che.docker.server_evaluation_strategy.custom.template: <serverName>-<if(isDevMachine)><workspaceIdWithoutPrefix><else><machineName><endif>-<externalAddress>
       che.docker.server_evaluation_strategy.custom.external.protocol: http
       che.predefined.stacks.reload_on_start: "false"
       log-level: INFO
-      docker-connector: openshift
       port: "8080"
       remote-debugging-enabled: "true"
       che-oauth-github-forceactivation: "true"
@@ -124,14 +121,10 @@ objects:
       che-workspaces-java-opts: -XX:+UseG1GC -XX:+UseStringDeduplication -XX:MinHeapFreeRatio=20
         -XX:MaxHeapFreeRatio=40 -XX:MaxRAM=1200m -Xms256m
       che-openshift-secure-routes: "false"
-      che-secure-external-urls: "false"
       che-server-timeout-ms: "3600000"
       che-openshift-precreate-subpaths: "false"
       che-workspace-auto-snapshot: "false"
       che-fabric8-multitenant: "false"
-      che-fabric8-user-service-endpoint: "https://api.openshift.io/api/user/services"
-      che-fabric8-workspace-routing-suffix: "8a09.starter-us-east-2.openshiftapps.com"
-      che-docker-enable-container-stop-detector: "false"
       che-workspace-che-server-endpoint: ""
       che-workspace-logs: "/data/logs/machine/logs"
       che-keycloak-auth-server-url: "https://sso.openshift.io/auth"
@@ -140,12 +133,7 @@ objects:
       che-wsagent-ping-success-threshold: "2"
       che-api: http://che-${PROJECT_NAME}.${DOMAIN_NAME}/api
       che-websocket-endpoint: ws://che-${PROJECT_NAME}.${DOMAIN_NAME}/api/websocket
-      bootstrapper-binary-url: "http://che-${PROJECT_NAME}.${DOMAIN_NAME}/agent-binaries/linux_amd64/bootstrapper/bootstrapper"
-      machine-start-timeout-min: "5"
-      openshift-master-url: ""
-      openshift-oauth-token: "${OPENSHIFT_OAUTH_TOKEN}"
       openshift-username: ""
-      openshift-password: ""
       openshift-project: "${PROJECT_NAME}"
       pvc-strategy: "unique"
       openshift-trust-certs: "false"
@@ -173,54 +161,15 @@ objects:
         spec:
           containers:
           - env:
-            - name: CHE_DOCKER_IP_EXTERNAL
-              valueFrom:
-                configMapKeyRef:
-                  key: che-host
-                  name: che
-            - name: CHE_WORKSPACE_STORAGE
-              valueFrom:
-                configMapKeyRef:
-                  key: workspace-storage
-                  name: che
             - name: CHE_LOGS_DIR
               valueFrom:
                 configMapKeyRef:
                   key: che.logs.dir
                   name: che
-            - name: CHE_WORKSPACE_STORAGE_CREATE_FOLDERS
-              valueFrom:
-                configMapKeyRef:
-                  key: workspace-storage-create-folders
-                  name: che
             - name: CHE_LOCAL_CONF_DIR
               valueFrom:
                 configMapKeyRef:
                   key: local-conf-dir
-                  name: che
-            - name: CHE_OPENSHIFT_PROJECT
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: CHE_OPENSHIFT_SERVICEACCOUNTNAME
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-serviceaccountname
-                  name: che
-            - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY
-              valueFrom:
-                configMapKeyRef:
-                  key: che-server-evaluation-strategy
-                  name: che
-            - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_TEMPLATE
-              valueFrom:
-                configMapKeyRef:
-                  key: che.docker.server_evaluation_strategy.custom.template
-                  name: che
-            - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_CUSTOM_EXTERNAL_PROTOCOL
-              valueFrom:
-                configMapKeyRef:
-                  key: che.docker.server_evaluation_strategy.custom.external.protocol
                   name: che
             - name: CHE_PREDEFINED_STACKS_RELOAD__ON__START
               valueFrom:
@@ -237,135 +186,25 @@ objects:
                 configMapKeyRef:
                   key: port
                   name: che
-            - name: CHE_DOCKER_CONNECTOR
-              valueFrom:
-                configMapKeyRef:
-                  key: docker-connector
-                  name: che
             - name: CHE_DEBUG_SERVER
               valueFrom:
                 configMapKeyRef:
                   key: remote-debugging-enabled
-                  name: che
-            - name: CHE_OAUTH_GITHUB_FORCEACTIVATION
-              valueFrom:
-                configMapKeyRef:
-                  key: che-oauth-github-forceactivation
-                  name: che
-            - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_OVERRIDE
-              valueFrom:
-                configMapKeyRef:
-                  key: workspaces-memory-limit
-                  name: che
-            - name: CHE_OPENSHIFT_WORKSPACE_MEMORY_REQUEST
-              valueFrom:
-                configMapKeyRef:
-                  key: workspaces-memory-request
-                  name: che
-            - name: CHE_WORKSPACE_AUTO__START
-              valueFrom:
-                configMapKeyRef:
-                  key: enable-workspaces-autostart
                   name: che
             - name: JAVA_OPTS
               valueFrom:
                 configMapKeyRef:
                   key: che-server-java-opts
                   name: che
-            - name: CHE_WORKSPACE_JAVA_OPTIONS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-workspaces-java-opts
-                  name: che
-            - name: CHE_OPENSHIFT_SECURE_ROUTES
-              valueFrom:
-                configMapKeyRef:
-                  key: che-openshift-secure-routes
-                  name: che
-            - name: CHE_DOCKER_SERVER__EVALUATION__STRATEGY_SECURE_EXTERNAL_URLS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-secure-external-urls
-                  name: che
-            - name: CHE_OPENSHIFT_SERVER_INACTIVE_STOP_TIMEOUT_MS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-server-timeout-ms
-                  name: che
-            - name: CHE_OPENSHIFT_PRECREATE_WORKSPACE_DIRS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-openshift-precreate-subpaths
-                  name: che
-            - name: CHE_KEYCLOAK_OSO_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: keycloak-oso-endpoint
-                  name: che
-            - name: CHE_KEYCLOAK_GITHUB_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: keycloak-github-endpoint
-                  name: che
-            - name: CHE_WORKSPACE_AUTO__SNAPSHOT
-              valueFrom:
-                configMapKeyRef:
-                  key: che-workspace-auto-snapshot
-                  name: che
-            - name: CHE_FABRIC8_MULTITENANT
-              valueFrom:
-                configMapKeyRef:
-                  key: che-fabric8-multitenant
-                  name: che
-            - name: CHE_FABRIC8_USER__SERVICE_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: che-fabric8-user-service-endpoint
-                  name: che
-            - name: CHE_FABRIC8_WORKSPACES_ROUTING__SUFFIX
-              valueFrom:
-                configMapKeyRef:
-                  key: che-fabric8-workspace-routing-suffix
-                  name: che
-            - name: CHE_DOCKER_ENABLE__CONTAINER__STOP__DETECTOR
-              valueFrom:
-                configMapKeyRef:
-                  key: che-docker-enable-container-stop-detector
-                  name: che
-            - name: CHE_WORKSPACE_CHE__SERVER__ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: che-workspace-che-server-endpoint
-                  name: che
-            - name: CHE_WORKSPACE_CHE_LOGS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-workspace-logs
-                  name: che
             - name: CHE_KEYCLOAK_AUTH__SERVER__URL
               valueFrom:
                 configMapKeyRef:
                   key: che-keycloak-auth-server-url
                   name: che
-            - name: CHE_KEYCLOAK_REALM
-              valueFrom:
-                configMapKeyRef:
-                  key: che-keycloak-realm
-                  name: che
-            - name: CHE_KEYCLOAK_CLIENT__ID
-              valueFrom:
-                configMapKeyRef:
-                  key: che-keycloak-client-id
-                  name: che
             - name: CHE_HOST
               valueFrom:
                 configMapKeyRef:
                   key: che-host
-                  name: che
-            - name: CHE_WORKSPACE_AGENT_DEV_PING__SUCCESS__THRESHOLD
-              valueFrom:
-                configMapKeyRef:
-                  key: che-wsagent-ping-success-threshold
                   name: che
             - name: CHE_API
               valueFrom:
@@ -382,70 +221,15 @@ objects:
                 configMapKeyRef:
                   key: docker-connector
                   name: che
-            - name: CHE_INFRA_OPENSHIFT_BOOTSTRAPPER_BINARY__URL
-              valueFrom:
-                configMapKeyRef:
-                  key: bootstrapper-binary-url
-                  name: che
-            - name: CHE_SERVER_JAVA_OPTS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-server-java-opts
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_MACHINE__START__TIMEOUT__MIN
-              valueFrom:
-                configMapKeyRef:
-                  key: machine-start-timeout-min
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_MASTER__URL
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-master-url
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_OAUTH__TOKEN
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-oauth-token
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_PASSWORD
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-password
-                  name: che
             - name: CHE_INFRA_OPENSHIFT_PROJECT
               valueFrom:
                 configMapKeyRef:
                   key: openshift-project
                   name: che
-            - name: CHE_INFRA_KUBERNETES_NAMESPACE
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-project
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_PVC_STRATEGY
-              valueFrom:
-                configMapKeyRef:
-                  key: pvc-strategy
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_PVC_PRECREATE__SUBPATHS
-              valueFrom:
-                configMapKeyRef:
-                  key: che-openshift-precreate-subpaths
-                  name: che
             - name: CHE_INFRA_OPENSHIFT_TLS__ENABLED
               valueFrom:
                 configMapKeyRef:
                   key: che-openshift-secure-routes
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_TRUST__CERTS
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-trust-certs
-                  name: che
-            - name: CHE_INFRA_OPENSHIFT_USERNAME
-              valueFrom:
-                configMapKeyRef:
-                  key: openshift-username
                   name: che
             - name: CHE_MULTIUSER
               valueFrom:
@@ -506,4 +290,3 @@ objects:
       to:
         kind: Service
         name: che-host
-
